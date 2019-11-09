@@ -1,7 +1,6 @@
-import sys
 import logging
 from package.generic.utils import data
-
+import sys
 import discord
 from discord.ext import commands
 import sqlite3
