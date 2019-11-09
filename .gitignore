@@ -3,3 +3,4 @@ extensions
 .vscode
 __pycache__
 secrets.json
+*.db

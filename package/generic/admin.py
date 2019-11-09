@@ -45,8 +45,8 @@ class Administrator(commands.Cog):
     
 def setup(bot: commands.Bot):
     bot.add_cog(Administrator(data))
-    discord_logger.info("Loaded module generic.admin")
+    discord_logger.info("Loaded extension generic.admin")
 
 def teardown(bot: commands.Bot):
     bot.remove_cog("Administrator")
-    discord_logger.info("Unloaded module generic.admin")
+    discord_logger.info("Unloaded extension generic.admin")

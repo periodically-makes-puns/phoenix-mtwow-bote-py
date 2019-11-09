@@ -10,13 +10,16 @@ import sqlite3
 desc = """A generic miniTWOW Discord bot and website.
 Maintainer is currently PMPuns#5728."""
 discord_logger = logging.getLogger('discord')
-discord_logger.setLevel(logging.DEBUG)
+discord_logger.setLevel(logging.INFO)
+sql_logger = logging.getLogger("sqlite3")
+sql_logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler(stream=sys.stdout)
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 discord_logger.addHandler(handler)
+sql_logger.addHandler(handler)
 bot = commands.Bot(command_prefix=data["prefix"], descrption=desc)
 
-extensions = ["generic.admin"]
+extensions = ["generic.admin", "mtwow.discord.admin"]
 
 @bot.event
 async def on_ready():
@@ -30,7 +33,7 @@ async def on_ready():
     for extension in extensions:
         discord_logger.debug("Loading extension {:s}".format(extension))
         try:
-            bot.load_extension(extension)
+            bot.load_extension("package." + extension)
         except commands.ExtensionNotFound:
             discord_logger.debug("Failed to load extension {:s}: Not found.".format(extension))
         except commands.ExtensionAlreadyLoaded:

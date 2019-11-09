@@ -17,20 +17,23 @@ def handleSQLErrors(func: Callable):
             return (2, "SQL Error occurred.")
     return handler
 
-
+@handleSQLErrors
 def init(conn: sqlite3.Connection):
     conn.executescript("""
     CREATE TABLE IF NOT EXISTS Members (
         uid INTEGER PRIMARY KEY NOT NULL,
         aggregateVoteCount INTEGER DEFAULT 0,
-        roundVoteCount INTEGER DEFAULT 0
+        roundVoteCount INTEGER DEFAULT 0,
+        remindStart UNSIGNED BIG INT,
+        remindInterval UNSIGNED BIG INT
     );
 
     CREATE TABLE IF NOT EXISTS Contestants (
         uid INTEGER PRIMARY KEY NOT NULL,
         alive BOOLEAN DEFAULT 0,
         allowedResponseCount INTEGER DEFAULT 1,
-        responseCount INTEGER DEFAULT 0
+        responseCount INTEGER DEFAULT 0,
+        prized INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS Responses (
@@ -51,11 +54,15 @@ def init(conn: sqlite3.Connection):
     );
 
     CREATE TABLE IF NOT EXISTS Status (
+        id INTEGER PRIMARY KEY,
         roundNum INTEGER,
         prompt TEXT,
         phase TEXT,
-        deadline INTEGER
+        deadline UNSIGNED BIG INT,
+        startTime UNSIGNED BIG INT
     );
+
+    INSERT OR IGNORE INTO Status VALUES (0, 1, NULL, "none", -1, -1);
 
     CREATE TABLE IF NOT EXISTS ResponseArchive (
         roundNum INTEGER NOT NULL,
@@ -68,7 +75,8 @@ def init(conn: sqlite3.Connection):
         skew DOUBLE NOT NULL
     );
     """)
-
+    
+@handleSQLErrors
 def wipe(conn: sqlite3.Connection):
     conn.executescript("""
         DROP TABLE IF EXISTS Members;

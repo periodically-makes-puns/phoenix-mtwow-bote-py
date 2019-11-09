@@ -124,7 +124,9 @@ def newScreen(conn: sqlite3.Connection, uid: int, voteNumber: int, screenSize: i
 
 
 def getGSeed(screen: List[sqlite3.Row]) -> str:
-    pass
+    return "-".join([resp["id"] for resp in screen])
 
-def getScreen(gseed: str) -> List[sqlite3.Row]:
-    pass
+@sqlutils.handleSQLErrors
+def getScreen(conn: sqlite3.Connection, gseed: str) -> List[sqlite3.Row]:
+    return [sqlutils.getResponseByID(conn, int(p)) for p in gseed.split("-")]
+    
