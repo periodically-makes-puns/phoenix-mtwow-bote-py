@@ -89,15 +89,15 @@ def wipe(conn: sqlite3.Connection):
 
 def isContestant(conn: sqlite3.Connection, uid: int) -> bool:
     sql_logger.debug("Checking if {:d} is a contestant.".format(uid))
-    return isinstance(conn.execute("SELECT * FROM Contestants WHERE uid = ?;", uid).fetchone(), sqlite3.Row)
+    return isinstance(conn.execute("SELECT * FROM Contestants WHERE uid = ?;", (uid,)).fetchone(), sqlite3.Row)
 
 def isDead(conn: sqlite3.Connection, uid: int) -> bool:
     sql_logger.debug("Checking if {:d} is alive.".format(uid))
-    return bool(conn.execute("SELECT alive FROM Contestants WHERE uid=?;").fetchone()["alive"])
+    return bool(conn.execute("SELECT alive FROM Contestants WHERE uid=?;", (uid,)).fetchone()["alive"])
 
 def addContestant(conn: sqlite3.Connection, uid: int):
     sql_logger.debug("Adding contestant with ID {:d}".format(uid))
-    conn.execute("INSERT INTO Contestants (uid, alive) VALUES (?, 1);")
+    conn.execute("INSERT INTO Contestants (uid, alive) VALUES (?, 1);", (uid,))
 
 def phase(conn: sqlite3.Connection) -> str:
     sql_logger.debug("Getting current phase")
@@ -122,15 +122,15 @@ def getResponseByUID(conn: sqlite3.Connection, uid: int, responseNumber: int) ->
 
 def getResponseByID(conn: sqlite3.Connection, id: int) -> sqlite3.Row:
     sql_logger.debug("Getting response with ID {:d}".format(id))
-    return conn.execute("SELECT * FROM Responses WHERE id = ?;", id).fetchone()
+    return conn.execute("SELECT * FROM Responses WHERE id = ?;", (id,)).fetchone()
 
 def allowedResponses(conn: sqlite3.Connection, uid: int) -> int:
     sql_logger.debug("Getting number of responses for contestant {:d}".format(uid))
-    return conn.execute("SELECT allowedResponses FROM Contestants WHERE uid = ?;", uid).fetchone()["allowedResponses"]
+    return conn.execute("SELECT allowedResponses FROM Contestants WHERE uid = ?;", (uid,)).fetchone()["allowedResponses"]
 
 def getAllResponsesButOwn(conn: sqlite3.Connection, uid: int) -> List[sqlite3.Row]:
     sql_logger.debug("Getting all responses except those of {:d}".format(uid))
-    return conn.execute("SELECT * FROM Responses WHERE uid != ?;", uid).fetchall()
+    return conn.execute("SELECT * FROM Responses WHERE uid != ?;", (uid,)).fetchall()
 
 def getAllResponsesButOne(conn: sqlite3.Connection, uid: int, responseNumber: int) -> List[sqlite3.Row]:
     sql_logger.debug("Getting all responses except response {:d} submitted by {:d}".format(responseNumber, uid))
