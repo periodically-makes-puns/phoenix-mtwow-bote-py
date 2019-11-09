@@ -1,6 +1,6 @@
 import sys
 import logging
-from utils import data
+from package.generic.utils import data
 
 import discord
 from discord.ext import commands
@@ -11,7 +11,7 @@ import sqlite3
 desc = """A generic miniTWOW Discord bot and website.
 Maintainer is currently PMPuns#5728."""
 discord_logger = logging.getLogger('discord')
-discord_logger.setLevel(logging.INFO)
+discord_logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler(stream=sys.stdout)
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 discord_logger.addHandler(handler)
@@ -60,7 +60,7 @@ async def load_all(ctx: commands.Context):
     for extension in extensions:
         discord_logger.debug("Loading extension {:s}".format(extension))
         try:
-            bot.load_extension(extension)
+            bot.load_extension("package." + extension)
             count += 1
         except commands.ExtensionNotFound:
             discord_logger.debug("Failed to load extension {:s}: Not found.".format(extension))
@@ -78,7 +78,7 @@ async def reload_all(ctx: commands.Context):
     for extension in extensions:
         discord_logger.debug("Reloading extension {:s}".format(extension))
         try:
-            bot.reload_extension(extension)
+            bot.reload_extension("package." + extension)
             count += 1
         except commands.ExtensionNotFound:
             discord_logger.debug("Failed to reload extension {:s}: Not found.".format(extension))
@@ -87,5 +87,5 @@ async def reload_all(ctx: commands.Context):
         except commands.ExtensionFailed:
             discord_logger.debug("Failed to reload extension {0:s}: {0:s} errored in its entry function.".format(extension))
     await ctx.send("Reloaded {:d} of {:d} extensions. Check debug logs for more details.".format(count, len(extensions)))
-      
+    
 bot.run(data["token"])

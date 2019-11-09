@@ -1,25 +1,27 @@
 """
 Defines the functions needed for the common user.
 """
-import sqlutils
-from utils import data
+from . import sqlutils
+from ...generic.utils import data
 import sqlite3
 import random
-from typing import Tuple, Union, List
-conn = sqlite3.connect("data.conn")
+import logging
+from typing import Tuple, Union, List, Callable
+sql_logger = logging.getLogger("sqlite3")
 
-def signup(uid: int) -> Tuple[int, str]:
+@sqlutils.handleSQLErrors
+def signup(conn: sqlite3.Connection, uid: int) -> Tuple[int, str]:
     if sqlutils.isContestant(conn, uid):
         return (2, "You are already signed up.")
     if data["owner"] == uid:
         return (2, "You are an administrator. You may not sign up.")
-
     if sqlutils.phase(conn) != "signups" and (sqlutils.phase(conn) != "responding" or sqlutils.roundNum(conn) != 1):
         return (2, "Not in signup phase.")
     sqlutils.addContestant(conn, uid)
     return (0, "You have been signed up.")
-
-def respond(uid: int, responseNumber: int, response: str) -> Tuple[int, str]:
+    
+@sqlutils.handleSQLErrors
+def respond(conn: sqlite3.Connection, uid: int, responseNumber: int, response: str) -> Tuple[int, str]:
     responseNumber -= 1
     if not sqlutils.isContestant(conn, uid):
         return (2, "You are not a contestant!")
@@ -44,6 +46,7 @@ def respond(uid: int, responseNumber: int, response: str) -> Tuple[int, str]:
         message = "Your word count is under 10 words."
     return (status, message)
 
+@sqlutils.handleSQLErrors
 def newScreen(conn: sqlite3.Connection, uid: int, voteNumber: int, screenSize: int) -> Tuple[int, Union[List[sqlite3.Row], str]]:
     # our pool of responses
     allowedResponses = []

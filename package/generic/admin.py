@@ -2,19 +2,16 @@ from discord.ext import commands
 import discord
 import json
 import logging
-
-with open("secrets.json") as f:
-    data = json.load(f)
+from .utils import data
 discord_logger = logging.getLogger('discord')
 
 class Administrator(commands.Cog):
-    
     @commands.command(brief="Reloads a module.")
     @commands.check(commands.is_owner())
     async def reload(self, ctx: commands.Context, module: str):
         discord_logger.info("{:s} issued command to reload module {:s}".format(str(ctx.message.author), module))
         try:
-            ctx.bot.reload_extension(module)
+            ctx.bot.reload_extension("package." + module)
             await ctx.send("Reloaded extension {:s}.".format(module))
         except commands.ExtensionNotFound:
             await ctx.send("Failed to reload extension {:s}: Not found.".format(module))
@@ -28,7 +25,7 @@ class Administrator(commands.Cog):
     async def unload(self, ctx: commands.Context, module: str):
         discord_logger.info("{:s} issued command to unload module {:s}".format(str(ctx.message.author), module))
         try:
-            ctx.bot.unload_extension(module)
+            ctx.bot.unload_extension("package." + module)
         except commands.ExtensionNotLoaded:
             await ctx.send("Failed to unload extension {:s}: Not loaded yet. Please use load command to load extension first.".format(module))
     
