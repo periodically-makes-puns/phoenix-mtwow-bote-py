@@ -87,13 +87,43 @@ def wipe(conn: sqlite3.Connection):
         DROP TABLE IF EXISTS ResponseArchive;
     """)
 
+def getTime(conn: sqlite3.Connection) -> int:
+    return conn.execute("SELECT startTime FROM Status;").fetchone()["startTime"]
+
+def getDeadline(conn: sqlite3.Connection) -> int:
+    return conn.execute("SELECT deadline FROM Status;").fetchone()["deadline"]
+
+def setPhase(conn: sqlite3.Connection, status: str):
+    sql_logger.debug("Set phase to {:s}".format(status))
+    conn.execute("UPDATE Status SET phase=?;", (status,))
+
+def setDeadline(conn: sqlite3.Connection, time: int):
+    sql_logger.debug("Set deadline to {:d}ms after now.".format(time))
+    conn.execute("UPDATE Status SET deadline=?;", (time,))
+
+def setStartTime(conn: sqlite3.Connection, time: int):
+    sql_logger.debug("Set time phase started to {:d}ms after epoch.".format(time))
+    conn.execute("UPDATE Status SET startTime=?;", (time,))
+
+def setPrompt(conn: sqlite3.Connection, prompt: str):
+    sql_logger.debug("Set prompt to:\n{:s}".format(prompt))
+    conn.execute("UPDATE Status SET prompt=?;", (prompt,))
+
+def setAllResponseCount(conn: sqlite3.Connection, count: int):
+    sql_logger.debug("Set default response count to {:d}".format(count))
+    conn.execute("UPDATE Contestants SET allowedResponses = 1;")
+
+def wipeAllResponses(conn: sqlite3.Connection):
+    sql_logger.warning("Wiping all responses!")
+    conn.execute("DELETE FROM Responses;")
+
 def isContestant(conn: sqlite3.Connection, uid: int) -> bool:
     sql_logger.debug("Checking if {:d} is a contestant.".format(uid))
     return isinstance(conn.execute("SELECT * FROM Contestants WHERE uid = ?;", (uid,)).fetchone(), sqlite3.Row)
 
-def isDead(conn: sqlite3.Connection, uid: int) -> bool:
-    sql_logger.debug("Checking if {:d} is alive.".format(uid))
-    return bool(conn.execute("SELECT alive FROM Contestants WHERE uid=?;", (uid,)).fetchone()["alive"])
+def getContestant(conn: sqlite3.Connection, uid: int) -> bool:
+    sql_logger.debug("Getting contestant with uid {:d}".format(uid))
+    return bool(conn.execute("SELECT * FROM Contestants WHERE uid=?;", (uid,)).fetchone())
 
 def addContestant(conn: sqlite3.Connection, uid: int):
     sql_logger.debug("Adding contestant with ID {:d}".format(uid))
@@ -136,10 +166,15 @@ def getAllResponsesButOne(conn: sqlite3.Connection, uid: int, responseNumber: in
     sql_logger.debug("Getting all responses except response {:d} submitted by {:d}".format(responseNumber, uid))
     return conn.execute("SELECT * FROM Responses WHERE uid != ? OR rid != ?;", (uid, responseNumber)).fetchall()
 
-
 def getAllResponses(conn: sqlite3.Connection) -> List[sqlite3.Row]:
     sql_logger.debug("Getting all responses.")
     return conn.execute("SELECT * FROM Responses;").fetchall()
+
+def getAllContestants(conn: sqlite3.Connection) -> List[sqlite3.Row]:
+    return conn.execute("SELECT * FROM Contestants;").fetchall()
+
+def killContestant(conn: sqlite3.Connection, uid: int):
+    conn.execute("UPDATE Contestants SET alive=0 WHERE uid=?;", (uid,))
 
 def wordCount(string: str) -> int:
     return len(string.split())

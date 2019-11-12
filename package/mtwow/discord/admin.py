@@ -3,6 +3,7 @@ from ..general import sqlutils, admin
 from ...generic.utils import parse_time, data
 import sqlite3
 import logging
+import atexit
 conn = sqlite3.Connection("./package/mtwow/data.db")
 discord_logger = logging.getLogger("discord")
 
@@ -33,8 +34,11 @@ class MTwowAdministrator(commands.Cog):
 
 def setup(bot: commands.Bot):
     discord_logger.info("Loading extension mtwow.discord.admin")
+    admin.fixTime(conn)
     bot.add_cog(MTwowAdministrator())
+    atexit.register(admin.fixTime, args=(conn))
 
 def teardown(bot: commands.Bot):
     discord_logger.info("Unloading extension mtwow.discord.admin")
     bot.remove_cog("MTwowAdministrator")
+    atexit.unregister(admin.fixTime)

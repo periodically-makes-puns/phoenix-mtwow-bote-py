@@ -4,8 +4,7 @@ import sys
 import discord
 from discord.ext import commands
 import sqlite3
-
-
+import atexit
 
 desc = """A generic miniTWOW Discord bot and website.
 Maintainer is currently PMPuns#5728."""

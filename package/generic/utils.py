@@ -88,25 +88,25 @@ class ColoredTerminalLogger(logging.Logger):
         print(ColoredTerminalLogger.BOLD + "REALLY IMPORTANT." + ColoredTerminalLogger.UNBOLD + " Or not." + ColoredTerminalLogger.RESET)
         print(ColoredTerminalLogger.ULINE + "Read this." + ColoredTerminalLogger.UNLINE + " Or don't." + ColoredTerminalLogger.RESET)
 
-    def info(self, message: str, *args, **kwargs):
+    def info(self, msg: str, *args, **kwargs):
         if (self.getEffectiveLevel() <= logging.INFO):
-            logging.Logger.info(self, ColoredTerminalLogger.INFO + message + ColoredTerminalLogger.RESET, *args, **kwargs)
+            logging.Logger.info(self, ColoredTerminalLogger.INFO + msg + ColoredTerminalLogger.RESET, *args, **kwargs)
 
-    def critical(self, message: str, *args, **kwargs):
+    def critical(self, msg: str, *args, **kwargs):
         if (self.getEffectiveLevel() <= logging.CRITICAL):
-            logging.Logger.critical(self, ColoredTerminalLogger.FAIL + message + ColoredTerminalLogger.RESET, *args, **kwargs)
+            logging.Logger.critical(self, ColoredTerminalLogger.FAIL + msg + ColoredTerminalLogger.RESET, *args, **kwargs)
 
-    def debug(self, message: str, *args, **kwargs):
+    def debug(self, msg: str, *args, **kwargs):
         if (self.getEffectiveLevel() <= logging.DEBUG):
-            logging.Logger.debug(self, ColoredTerminalLogger.DEBUG + message + ColoredTerminalLogger.RESET, *args, **kwargs)
+            logging.Logger.debug(self, ColoredTerminalLogger.DEBUG + msg + ColoredTerminalLogger.RESET, *args, **kwargs)
 
-    def warning(self, message: str, *args, **kwargs) -> str:
+    def warning(self, msg: str, *args, **kwargs) -> str:
         if (self.getEffectiveLevel() <= logging.WARNING):
-            logging.Logger.warning(self, ColoredTerminalLogger.WARN + message + ColoredTerminalLogger.RESET, *args, **kwargs)
+            logging.Logger.warning(self, ColoredTerminalLogger.WARN + msg + ColoredTerminalLogger.RESET, *args, **kwargs)
 
-    def error(self, message: str, *args, **kwargs) -> str:
+    def error(self, msg: str, *args, **kwargs) -> str:
         if (self.getEffectiveLevel() <= logging.ERROR):
-            logging.Logger.error(self, ColoredTerminalLogger.FAIL + message + ColoredTerminalLogger.RESET, *args, **kwargs)
+            logging.Logger.error(self, ColoredTerminalLogger.FAIL + msg + ColoredTerminalLogger.RESET, *args, **kwargs)
 
 logging.setLoggerClass(ColoredTerminalLogger)
 discord_logger = logging.getLogger("discord")
