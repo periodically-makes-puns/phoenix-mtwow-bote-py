@@ -35,8 +35,11 @@ class MTwowAdministrator(commands.Cog):
 def setup(bot: commands.Bot):
     discord_logger.info("Loading extension mtwow.discord.admin")
     admin.fixTime(conn)
+    admin.setTimer(sqlutils.getDeadline(conn), admin.fixTime, args=(conn))
     bot.add_cog(MTwowAdministrator())
     atexit.register(admin.fixTime, args=(conn))
+    atexit.register(admin.stopTimer)
+    
 
 def teardown(bot: commands.Bot):
     discord_logger.info("Unloading extension mtwow.discord.admin")

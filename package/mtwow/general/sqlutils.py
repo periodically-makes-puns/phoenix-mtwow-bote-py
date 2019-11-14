@@ -88,10 +88,10 @@ def wipe(conn: sqlite3.Connection):
     """)
 
 def getTime(conn: sqlite3.Connection) -> int:
-    return conn.execute("SELECT startTime FROM Status;").fetchone()["startTime"]
+    return conn.execute("SELECT startTime FROM Status;").fetchone()[0]
 
 def getDeadline(conn: sqlite3.Connection) -> int:
-    return conn.execute("SELECT deadline FROM Status;").fetchone()["deadline"]
+    return conn.execute("SELECT deadline FROM Status;").fetchone()[0]
 
 def setPhase(conn: sqlite3.Connection, status: str):
     sql_logger.debug("Set phase to {:s}".format(status))
@@ -121,9 +121,9 @@ def isContestant(conn: sqlite3.Connection, uid: int) -> bool:
     sql_logger.debug("Checking if {:d} is a contestant.".format(uid))
     return isinstance(conn.execute("SELECT * FROM Contestants WHERE uid = ?;", (uid,)).fetchone(), sqlite3.Row)
 
-def getContestant(conn: sqlite3.Connection, uid: int) -> bool:
+def getContestant(conn: sqlite3.Connection, uid: int) -> sqlite3.Row:
     sql_logger.debug("Getting contestant with uid {:d}".format(uid))
-    return bool(conn.execute("SELECT * FROM Contestants WHERE uid=?;", (uid,)).fetchone())
+    return conn.execute("SELECT * FROM Contestants WHERE uid=?;", (uid,)).fetchone()
 
 def addContestant(conn: sqlite3.Connection, uid: int):
     sql_logger.debug("Adding contestant with ID {:d}".format(uid))
@@ -131,11 +131,11 @@ def addContestant(conn: sqlite3.Connection, uid: int):
 
 def phase(conn: sqlite3.Connection) -> str:
     sql_logger.debug("Getting current phase")
-    return conn.execute("SELECT phase FROM Status;").fetchone()["phase"]
+    return conn.execute("SELECT phase FROM Status;").fetchone()[0]
 
 def roundNum(conn: sqlite3.Connection) -> int:
     sql_logger.debug("Getting round number")
-    return conn.execute("SELECT roundNum FROM Status;").fetchone()["roundNum"]
+    return conn.execute("SELECT roundNum FROM Status;").fetchone()[0]
 
 def editResponse(conn: sqlite3.Connection, uid: int, responseNumber: int, response: str):
     sql_logger.debug("Editing response {:d} of contestant {:d} to:\n{:s}".format(responseNumber, uid, response))

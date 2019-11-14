@@ -4,8 +4,9 @@ from typing import List, Callable
 from ...generic.utils import data, parse_time
 import logging
 import time
+import threading
 sql_logger = logging.getLogger("sqlite3")
-
+timer = None
 @sqlutils.handleSQLErrors
 def start_signups(conn: sqlite3.Connection, t: int):
     sql_logger.debug("Starting signups with deadline in {:d} ms".format(t))
@@ -29,7 +30,6 @@ def end_responding(conn: sqlite3.Connection):
     for contestant in contestants:
         if contestant["responseCount"] == 0:
             sqlutils.killContestant(conn, contestant["uid"])
-    start_voting(conn)
 
 @sqlutils.handleSQLErrors
 def fixTime(conn: sqlite3.Connection):
@@ -60,3 +60,11 @@ def end_voting(conn: sqlite3.Connection):
 @sqlutils.handleSQLErrors
 def end_signups(conn: sqlite3.Connection):
     pass
+
+def setTimer(ms: int, func: Callable, *args, **kwargs):
+    timer = threading.Timer(ms / 1000, func, *args, **kwargs)
+    timer.start()
+
+def stopTimer():
+    if timer is not None:
+        timer.cancel()

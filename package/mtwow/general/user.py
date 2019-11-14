@@ -25,7 +25,7 @@ def respond(conn: sqlite3.Connection, uid: int, responseNumber: int, response: s
     responseNumber -= 1
     if not sqlutils.isContestant(conn, uid):
         return (2, "You are not a contestant!")
-    if sqlutils.isDead(conn, uid):
+    if not sqlutils.getContestant(conn, uid)["alive"]:
         return (2, "You are eliminated!")
     if sqlutils.phase(conn) != "respond":
         return (2, "Not in responding phase.")
